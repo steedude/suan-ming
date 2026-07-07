@@ -1,6 +1,7 @@
 'use client'
 
 import type { Gender } from '@/types/bazi'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -52,6 +53,7 @@ export default function BirthStep({
   onSubmit,
 }: Props) {
   const t = useTranslations('birth')
+  const [dateOpen, setDateOpen] = useState(false)
   const selectedDate = parseDateInput(date)
   const [hour = '12', minute = '00'] = time.split(':')
 
@@ -71,7 +73,7 @@ export default function BirthStep({
           <Label htmlFor="birth-date" className="mb-1 block text-stone-600">
             {t('dateLabel')}
           </Label>
-          <Popover>
+          <Popover open={dateOpen} onOpenChange={setDateOpen}>
             <PopoverTrigger asChild>
               <Button
                 id="birth-date"
@@ -87,13 +89,22 @@ export default function BirthStep({
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-3" align="start">
+            <PopoverContent
+              className="w-[20rem] max-w-[calc(100vw-2rem)] p-3"
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={selectedDate}
+                defaultMonth={selectedDate}
+                startMonth={new Date(1900, 0)}
+                endMonth={new Date(2100, 11)}
                 disabled={{ before: new Date(1900, 0, 1), after: new Date(2100, 11, 31) }}
                 onSelect={(nextDate) => {
-                  if (nextDate) onDateChange(formatDateInput(nextDate))
+                  if (nextDate) {
+                    onDateChange(formatDateInput(nextDate))
+                    setDateOpen(false)
+                  }
                 }}
               />
             </PopoverContent>

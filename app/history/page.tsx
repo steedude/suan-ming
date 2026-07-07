@@ -1,6 +1,6 @@
 'use client'
 
-import type { BaziChart } from '@/types/bazi'
+import type { Database } from '@/types/database'
 import type { Locale } from '@/types/i18n'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -13,15 +13,7 @@ import { createClient, isSupabaseConfigured } from '@/lib/supabase/client'
 
 /** 我的紀錄:會員的歷史解讀,可展開回顧、可刪除 */
 
-interface Reading {
-  id: string
-  created_at: string
-  category: string
-  question: string
-  solar_date: string
-  chart: BaziChart
-  interpretation: string
-}
+type Reading = Database['public']['Tables']['readings']['Row']
 
 export default function HistoryPage() {
   const { user, loading: userLoading } = useUser()
@@ -36,10 +28,12 @@ export default function HistoryPage() {
     setLoading(true)
     const { data } = await createClient()
       .from('readings')
-      .select('id, created_at, category, question, solar_date, chart, interpretation')
+      .select(
+        'id, user_id, created_at, category, question, gender, solar_date, chart, interpretation',
+      )
       .order('created_at', { ascending: false })
       .limit(50)
-    setReadings((data as Reading[]) ?? [])
+    setReadings(data ?? [])
     setLoading(false)
   }, [])
 

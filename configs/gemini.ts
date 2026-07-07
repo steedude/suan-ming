@@ -1,9 +1,11 @@
+import { env } from '@/env'
+
 /**
  * Gemini 模型設定(僅伺服器端使用)
  */
 
 /** 使用的模型,可由環境變數覆寫 */
-export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+export const GEMINI_MODEL = env.GEMINI_MODEL
 
 /**
  * 生成參數

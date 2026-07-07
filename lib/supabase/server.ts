@@ -1,5 +1,7 @@
+import type { Database } from '@/types/database'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { env, isSupabaseEnvConfigured } from '@/env'
 
 /**
  * Supabase 伺服器端 client(Route Handler / Server Component 用)
@@ -9,18 +11,15 @@ import { cookies } from 'next/headers'
  */
 
 export function isSupabaseConfiguredOnServer(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  )
+  return isSupabaseEnvConfigured()
 }
 
 export async function createClient() {
   const cookieStore = await cookies()
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+  return createServerClient<Database>(
+    env.NEXT_PUBLIC_SUPABASE_URL!,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

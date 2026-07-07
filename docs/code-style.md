@@ -51,6 +51,7 @@ docs/         專案規範與產品/技術決策
 hooks/        Client hooks；名稱使用 useXxx
 i18n/         next-intl request 設定
 lib/          核心商業邏輯、第三方服務封裝
+lib/server/   只能在伺服器使用的 API helper、AI、限流、資料庫流程
 locales/      翻譯訊息來源
 tests/        單元測試與測試 setup
 types/        跨模組共用型別
@@ -75,8 +76,16 @@ utils/        無副作用小工具函式
 ## Server / Client 邊界
 
 - 預設使用 Server Component；需要 state、effect、瀏覽器 API、Supabase browser client 時才加 `'use client'`。
+- App Router 的 `app/page.tsx` 保持 Server Component；互動流程放在 `components/ReadingWizard.tsx`。
 - AI key、Supabase server client、額度檢查只放 server。
 - 前端可以即時排盤提升體感，但 server 必須重新計算一次，不信任前端傳入命盤。
+
+## 環境變數與限流
+
+- 所有環境變數由 [`env.ts`](../env.ts) 以 Zod 驗證。
+- 本機開發可不設定 Upstash,會退回記憶體限流。
+- 正式 serverless 部署建議設定 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`,避免多實例造成限流不準。
+- Supabase 型別集中在 `types/database.ts`,client/server 都要帶入 `Database` generic。
 
 ## 測試策略
 

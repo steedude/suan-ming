@@ -86,6 +86,11 @@ pnpm dev
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | ❌   | Supabase publishable key(會員功能用) |
 | `ANON_DAILY_LIMIT`                     | ❌   | 訪客每日解讀次數,預設 3              |
 | `MEMBER_DAILY_LIMIT`                   | ❌   | 會員每日解讀次數,預設 10             |
+| `PER_MINUTE_LIMIT`                     | ❌   | 每 IP 每分鐘請求上限,預設 6          |
+| `UPSTASH_REDIS_REST_URL`               | ❌   | Upstash Redis REST URL,正式限流用    |
+| `UPSTASH_REDIS_REST_TOKEN`             | ❌   | Upstash Redis REST Token             |
+
+環境變數會由 [`env.ts`](env.ts) 以 Zod 驗證。未設定 Upstash 時會退回記憶體限流,方便本機開發;正式部署到 Vercel/serverless 多實例時建議設定 Upstash,避免免費額度被多實例放大。
 
 ## 會員系統設定(選用)
 
@@ -119,12 +124,13 @@ pnpm dev
 
 ```
 app/
-  page.tsx                  三步驟流程的狀態編排
+  page.tsx                  Server Component 入口
   layout.tsx                全站佈局(含 Header)與 metadata
   globals.css               主題色、進場動畫、串流游標
   history/page.tsx          我的紀錄(會員歷史解讀,展開回顧/刪除)
   api/interpret/route.ts    解讀 API:驗證 → 額度 → 排盤 → Gemini 串流 → 保存
 components/
+  ReadingWizard.tsx         三步驟流程的 Client Component 狀態編排
   Header.tsx                全站頁首(品牌 + 登入/登出/我的紀錄)
   AuthDialog.tsx            登入/註冊對話框
   StepIndicator.tsx         步驟進度指示
@@ -135,12 +141,20 @@ components/
 lib/
   bazi.ts                   八字排盤(確定性、純函式、前後端共用)
   prompt.ts                 systemInstruction + 緊湊命盤序列化
+  server/
+    ai/gemini.ts            Gemini 串流呼叫
+    api-errors.ts           API 錯誤訊息
+    rate-limit.ts           Upstash Redis / 記憶體限流
+    readings.ts             readings 額度與保存
+    request.ts              request 解析與 locale/ip helper
   supabase/
     client.ts               瀏覽器端 client(含 isSupabaseConfigured)
     server.ts               伺服器端 client(cookie 綁定,RLS 保護)
     useUser.ts              登入狀態 hook
 supabase/
   schema.sql                readings 資料表 + RLS 政策
+types/
+  database.ts               Supabase Database 型別
 proxy.ts                    Supabase session 刷新(Next.js 16 middleware 慣例)
 .env.example                環境變數範例
 ```
