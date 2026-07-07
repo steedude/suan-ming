@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 /** 第一步:選擇問題類別、寫下困惑 */
 
@@ -41,23 +42,22 @@ export default function QuestionStep({
 
       <CardContent className="p-6 pt-0 sm:p-8 sm:pt-0">
         {/* 問題類別 */}
-        <div className="mb-4 flex flex-wrap gap-2">
+        <ToggleGroup
+          type="single"
+          value={category}
+          onValueChange={(value) => {
+            if (QUESTION_CATEGORIES.includes(value as QuestionCategory)) {
+              onCategoryChange(value as QuestionCategory)
+            }
+          }}
+          className="mb-4"
+        >
           {QUESTION_CATEGORIES.map((c) => (
-            <Button
-              key={c}
-              type="button"
-              variant={category === c ? 'secondary' : 'outline'}
-              onClick={() => onCategoryChange(c)}
-              className={`rounded-full ${
-                category === c
-                  ? 'border border-teal-600 bg-teal-50 text-teal-800 shadow-[0_2px_10px_rgba(13,148,136,.12)] hover:bg-teal-50'
-                  : 'border-stone-300 text-stone-500 hover:border-stone-400 hover:text-stone-700'
-              }`}
-            >
+            <ToggleGroupItem key={c} value={c} className="rounded-full">
               {t(`categories.${c}`)}
-            </Button>
+            </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
 
         <Textarea
           value={question}
