@@ -3,6 +3,7 @@ import { Noto_Sans_TC, Noto_Serif_TC } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import Header from '@/components/Header'
+import { SITE_URL, siteConfig } from '@/configs/site'
 import './globals.css'
 
 /** 內文:黑體;標題與干支:明朝體(古籍感) */
@@ -21,8 +22,55 @@ const serif = Noto_Serif_TC({
 })
 
 export const metadata: Metadata = {
-  title: '問命|AI 八字解讀',
-  description: '輸入你的困惑與生辰,由傳統八字排盤結合 AI,給你一點人生方向。',
+  metadataBase: SITE_URL,
+  applicationName: siteConfig.name,
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: 'astrology',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_TW',
+    alternateLocale: ['en_US'],
+    url: '/',
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} AI 八字解讀`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.twitterImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
 }
 
 export default async function RootLayout({

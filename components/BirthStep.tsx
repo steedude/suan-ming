@@ -1,8 +1,11 @@
 'use client'
 
 import type { Gender } from '@/types/bazi'
+import type { Locale as AppLocale } from '@/types/i18n'
+import type { Locale as DateFnsLocale } from 'date-fns'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { enUS, zhTW } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -24,6 +27,11 @@ import {
 } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { formatDateInput, parseDateInput } from '@/utils/date'
+
+const DATE_PICKER_LOCALES = {
+  'zh-TW': zhTW,
+  en: enUS,
+} satisfies Record<AppLocale, DateFnsLocale>
 
 /** 第二步:輸入陽曆生辰與性別 */
 
@@ -53,6 +61,7 @@ export default function BirthStep({
   onSubmit,
 }: Props) {
   const t = useTranslations('birth')
+  const locale = useLocale() as AppLocale
   const [dateOpen, setDateOpen] = useState(false)
   const selectedDate = parseDateInput(date)
   const [hour = '12', minute = '00'] = time.split(':')
@@ -97,6 +106,7 @@ export default function BirthStep({
                 mode="single"
                 selected={selectedDate}
                 defaultMonth={selectedDate}
+                locale={DATE_PICKER_LOCALES[locale]}
                 startMonth={new Date(1900, 0)}
                 endMonth={new Date(2100, 11)}
                 disabled={{ before: new Date(1900, 0, 1), after: new Date(2100, 11, 31) }}

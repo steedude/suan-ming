@@ -35,6 +35,7 @@
     "@upstash/redis": "^1.38.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "lucide-react": "^1.23.0",
     "lunar-typescript": "^1.8.6",
     "next": "16.2.10",

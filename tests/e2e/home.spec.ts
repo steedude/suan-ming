@@ -19,7 +19,9 @@ test('visitor can complete the form until server validation', async ({ page }) =
   await expect(page.getByText('你的出生時間')).toBeVisible()
 
   await page.locator('#birth-date').click()
-  await page.getByRole('button', { name: /July 15th/ }).click()
+  const calendarDialog = page.getByRole('dialog')
+  await expect(calendarDialog.getByRole('combobox').nth(1)).toContainText('七月')
+  await calendarDialog.getByRole('button').filter({ hasText: /^15$/ }).click()
   await expect(page.locator('#birth-date')).toContainText(/^\d{4}-\d{2}-15$/)
 
   await page.locator('#birth-hour').click()
