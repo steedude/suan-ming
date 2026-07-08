@@ -2,6 +2,7 @@ import type { SupabaseClient, User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import type { BaziChart } from '@/types/bazi'
 import type { InterpretRequest } from '@/lib/validation/interpret'
+import { reportServerError } from '@/lib/server/api-errors'
 import { todayTaipei } from '@/utils/date'
 
 export type AppSupabaseClient = SupabaseClient<Database>
@@ -11,11 +12,14 @@ export async function memberUsedToday(
   userId: string,
 ): Promise<number> {
   const startOfToday = `${todayTaipei()}T00:00:00+08:00`
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from('readings')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .gte('created_at', startOfToday)
+
+  if (error) throw error
+
   return count ?? 0
 }
 
@@ -35,5 +39,17 @@ export async function saveReading(
     chart,
     interpretation,
   })
-  if (error) console.error('saveReading failed:', error.message)
+  if (error) {
+    reportServerError('READING_SAVE_FAILED', {
+      cause: error,
+      context: {
+        tags: { source: 'supabase', operation: 'readings.insert' },
+        user: { id: user.id },
+        extra: {
+          category: body.category,
+          solarDate: chart.solarDate,
+        },
+      },
+    })
+  }
 }

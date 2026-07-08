@@ -73,7 +73,7 @@ export default function ReadingWizard() {
 
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => null)
-        setError(data?.error ?? home('errUnknown'))
+        setError(data?.message ?? data?.error ?? home('errUnknown'))
         return
       }
 
